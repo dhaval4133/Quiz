@@ -23,7 +23,7 @@ export type QuestionType = z.infer<typeof QuestionSchema>;
 
 // Schema for the input of the question generation flow
 const GenerateQuestionsInputSchema = z.object({
-  count: z.number().int().positive().min(1).max(10).describe("The number of questions to generate (e.g., 5)."),
+  count: z.number().int().positive().min(1).max(50).describe("The number of questions to generate (e.g., 5). Max 50."),
   topic: z.string().optional().describe("An optional topic for the quiz questions (e.g., 'World History', 'Science', 'General Knowledge'). If not provided, general knowledge questions will be generated."),
 });
 export type GenerateQuestionsInput = z.infer<typeof GenerateQuestionsInputSchema>;

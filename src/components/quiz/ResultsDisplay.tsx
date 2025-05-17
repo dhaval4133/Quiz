@@ -1,17 +1,26 @@
+
 "use client";
 
 import type React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, RefreshCw } from 'lucide-react';
+import { Award, RefreshCw, Clock } from 'lucide-react'; // Added Clock
 
 interface ResultsDisplayProps {
   score: number;
   totalQuestions: number;
   onRestart: () => void;
+  totalTimeTaken: number; // in seconds
 }
 
-const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ score, totalQuestions, onRestart }) => {
+const formatTime = (totalSeconds: number): string => {
+  if (totalSeconds < 0) totalSeconds = 0;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ score, totalQuestions, onRestart, totalTimeTaken }) => {
   const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
   let message = "";
   if (percentage >= 80) {
@@ -33,10 +42,21 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ score, totalQuestions, 
           <CardDescription className="text-lg pt-2">{message}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-5xl font-bold text-foreground">
-            {score} / {totalQuestions}
-          </p>
-          <p className="text-2xl text-accent font-semibold">{percentage}%</p>
+          <div>
+            <p className="text-sm text-muted-foreground">Your Score</p>
+            <p className="text-5xl font-bold text-foreground">
+              {score} / {totalQuestions}
+            </p>
+            <p className="text-2xl text-accent font-semibold">{percentage}%</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground flex items-center justify-center">
+              <Clock className="h-4 w-4 mr-1.5" /> Total Time Taken
+            </p>
+            <p className="text-xl font-semibold text-foreground">
+              {formatTime(totalTimeTaken)}
+            </p>
+          </div>
         </CardContent>
         <CardFooter>
           <Button onClick={onRestart} className="w-full text-lg py-6" size="lg">
@@ -50,3 +70,4 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ score, totalQuestions, 
 };
 
 export default ResultsDisplay;
+

@@ -1,38 +1,55 @@
+
 "use client";
 
 import type React from 'react';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'; // Added AlertTriangle for timeout
 import { cn } from '@/lib/utils';
 
 interface FeedbackIndicatorProps {
   isCorrect: boolean;
   correctAnswer: string;
-  userAnswer?: string;
+  userAnswer?: string | null; // Can be null if timed out
+  timedOut?: boolean;
 }
 
-const FeedbackIndicator: React.FC<FeedbackIndicatorProps> = ({ isCorrect, correctAnswer, userAnswer }) => {
+const FeedbackIndicator: React.FC<FeedbackIndicatorProps> = ({ isCorrect, correctAnswer, userAnswer, timedOut }) => {
+  let message = "";
+  let IconComponent = isCorrect ? CheckCircle2 : XCircle;
+  let bgColor = isCorrect ? "bg-accent text-accent-foreground" : "bg-destructive text-destructive-foreground";
+
+  if (timedOut) {
+    message = "Time's up!";
+    IconComponent = AlertTriangle;
+    // bgColor can remain destructive or be a specific timeout color e.g. bg-yellow-500 if themed
+  } else if (isCorrect) {
+    message = "Correct!";
+  } else {
+    message = "Incorrect!";
+  }
+
   return (
     <div
       className={cn(
-        "mt-4 p-4 rounded-lg flex items-center space-x-3 animate-scale-in shadow-md",
-        isCorrect ? "bg-accent text-accent-foreground" : "bg-destructive text-destructive-foreground"
+        "mt-4 p-4 rounded-lg flex items-start space-x-3 animate-scale-in shadow-md",
+        bgColor
       )}
     >
-      {isCorrect ? (
-        <CheckCircle2 className="h-6 w-6" />
-      ) : (
-        <XCircle className="h-6 w-6" />
-      )}
+      <IconComponent className="h-6 w-6 mt-0.5 shrink-0" />
       <div>
-        <p className="font-semibold">{isCorrect ? "Correct!" : "Incorrect!"}</p>
-        {!isCorrect && userAnswer && (
+        <p className="font-semibold">{message}</p>
+        {!isCorrect && userAnswer && !timedOut && (
           <p className="text-sm">
-            You answered: {userAnswer}. The correct answer is: {correctAnswer}.
+            You answered: "{userAnswer}". The correct answer is: "{correctAnswer}".
           </p>
         )}
-         {!isCorrect && !userAnswer && ( // Case where time runs out or no answer given (future enhancement)
+        {timedOut && (
           <p className="text-sm">
-            The correct answer is: {correctAnswer}.
+            The correct answer was: "{correctAnswer}".
+          </p>
+        )}
+         {!isCorrect && !userAnswer && !timedOut && (
+          <p className="text-sm">
+            The correct answer is: "{correctAnswer}".
           </p>
         )}
       </div>
@@ -41,3 +58,4 @@ const FeedbackIndicator: React.FC<FeedbackIndicatorProps> = ({ isCorrect, correc
 };
 
 export default FeedbackIndicator;
+
